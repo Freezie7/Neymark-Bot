@@ -6,7 +6,7 @@ import keyboards
 router = Router()
 
 @router.message(Command("start"))
-async def start(message: types.Message, state: FSMContext):
+async def cmd_start(message: types.Message, state: FSMContext):
     await state.clear()
     await message.answer(
         "Здарова! Ты попал в СпикерБот - секретное оружие для школьных выступлений! 🤫\n"
@@ -17,4 +17,8 @@ async def start(message: types.Message, state: FSMContext):
         "• Делаю твои ответы круче, чем у отличника! 💪\n\n"
         "Отправляй голосовуху и готовься блистать! ✨"
     )
+
+@router.message(Command("help"))
+async def cmd_help(message: Message):
+    await message.answer("Помощь: ...")
 
