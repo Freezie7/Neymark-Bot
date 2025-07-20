@@ -1,7 +1,7 @@
 import asyncio
 from aiogram import Bot, Dispatcher
 import config
-from handlers import router
+from handlers import routers
 
 async def on_startup():
     print("БОТ ЗАПУЩЕН")
@@ -9,7 +9,10 @@ async def on_startup():
 async def main():
     bot = Bot(config.TOKEN_BOT)
     dp = Dispatcher()
-    dp.include_router(router)  # Подключаем роутер
+
+    for router in routers:  # Подключаем все обработчики
+            dp.include_router(router)
+
     dp.startup.register(on_startup)
     try:
         await dp.start_polling(bot, skip_updates=True)
