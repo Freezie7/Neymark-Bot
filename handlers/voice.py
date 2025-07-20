@@ -4,7 +4,7 @@ from aiogram.fsm.context import FSMContext
 import keyboards
 router = Router()
 import os
-from utils.speech import speech_to_text
+from utils.speech import speech_to_text, find_pauses
 
 @router.message(F.voice)
 async def handle_voice(message: Message):
@@ -19,6 +19,10 @@ async def handle_voice(message: Message):
     print("конвертация прошла успешно")
     #Распознавание гс
     text = await speech_to_text(voice_path)
+    #получение пауз
+    pauses = find_pauses(voice_path)
+    if pauses:
+        text += f"\n\n⏸ Обнаружено пауз: {len(pauses)}"
     await message.reply(f"Ваше сообщение:\n\n{text}")
     #удаление временных файлов
     os.remove(voice_path)
