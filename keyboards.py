@@ -40,3 +40,27 @@ def get_task_difficulty_keyboard():
         [InlineKeyboardButton(text="Сложное 🔥", callback_data="hard_task")],
     ]
     return InlineKeyboardMarkup(inline_keyboard=keyboard)
+
+
+def get_debate_keyboard():
+    keyboard = [
+        [InlineKeyboardButton(text="Предложу тему", callback_data="my_theme")],
+        [InlineKeyboardButton(text="Рандомная тема", callback_data="random_theme")],
+    ]
+    return InlineKeyboardMarkup(inline_keyboard=keyboard)
+
+def get_debate_difficulty_keyboard():
+    keyboard = [
+        [InlineKeyboardButton(text="Лёгкая😄", callback_data="easy_theme")],
+        [InlineKeyboardButton(text="Средняя ⚖️", callback_data="medium_theme")],
+        [InlineKeyboardButton(text="Сложная 🔥", callback_data="hard_theme")],
+    ]
+    return InlineKeyboardMarkup(inline_keyboard=keyboard)
+
+def get_mode_debate_keyboard():
+        keyboard = [
+            [InlineKeyboardButton(text="Мягкий", callback_data="easy_debate")],
+            [InlineKeyboardButton(text="Стандартный", callback_data="standart_debate")],
+            [InlineKeyboardButton(text="Строгий", callback_data="hard_debate")],
+        ]
+        return InlineKeyboardMarkup(inline_keyboard=keyboard)
