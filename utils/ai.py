@@ -1,7 +1,7 @@
-from openai import OpenAI
+from openai import AsyncOpenAI
 from config import OPENAI_KEY
 
-client = OpenAI(api_key=OPENAI_KEY)
+client = AsyncOpenAI(api_key=OPENAI_KEY)
 
 model = "gpt-4.1-mini"
 
@@ -76,7 +76,7 @@ async def create_task_chatgpt(prompt: str, role: str, skill:str, mode: str, leve
     """Анализ текста через ChatGPT"""
     print("Подготовка задания от нейросети")
     try:
-        response = client.chat.completions.create(
+        response = await client.chat.completions.create(
             model=model,
             messages=[
                 {"role": "system", "content": role},
@@ -92,7 +92,7 @@ async def analyze_answer(prompt: str, role: str, skill:str, mode: str, history: 
     """Анализ текста через ChatGPT"""
     print("Подготовка оценки от нейросети")
     try:
-        response = client.chat.completions.create(
+        response = await client.chat.completions.create(
             model=model,
             messages=[
                 {"role": "system", "content": role},
@@ -110,7 +110,7 @@ async def continious_answer( history: str, answer: str) -> str:
     print("Подготовка оценки от нейросети")
     try:
         print(history)
-        response = client.chat.completions.create(
+        response = await client.chat.completions.create(
             model=model,
             messages=[
                 {"role": "system", "content": "Ты — наставник для школьников (12–17 лет) в Telegram-боте SkillDebater. Твоя задача проверить улучшил ли пользователь свой ответ"},
@@ -175,7 +175,7 @@ async def create_task_chatgpt_debate(prompt: str, role: str, level: str, theme: 
     """Анализ текста через ChatGPT"""
     print("Подготовка ответа от нейросети")
     try:
-        response = client.chat.completions.create(
+        response = await client.chat.completions.create(
             model=model,
             messages=[
                 {"role": "system", "content": role},
@@ -198,7 +198,7 @@ async def continious_debate(history: str, answer: str, mode:str) -> str:
         role =role_hard
 
     try:
-        response = client.chat.completions.create(
+        response = await client.chat.completions.create(
             model=model,
             messages=[
                 {"role": "system", "content": role},
