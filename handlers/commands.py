@@ -74,6 +74,7 @@ async def callback_skillmode(callback: types.CallbackQuery, state: FSMContext, b
         await state.update_data(skill="Эмпатия 💖")
     elif callback.data == "five":
         await state.update_data(skill="Критическое мышление 🤔")
+    await bot.delete_message(chat_id=callback.message.chat.id, message_id=callback.message.message_id)
 
     keyboard = keyboards.get_task_difficulty_keyboard()
     await bot.send_message(chat_id=callback.message.chat.id, text="Хорошо, теперь выбери сложность задания", reply_markup=keyboard)
@@ -88,6 +89,7 @@ async def callback_level(callback: types.CallbackQuery, state: FSMContext, bot: 
         await state.update_data(level="Среднее")
     elif callback.data == "hard_task":
         await state.update_data(level="Сложное")
+    await bot.delete_message(chat_id=callback.message.chat.id, message_id=callback.message.message_id)
 
     keyboard = keyboards.get_mode_keyboard()
     await bot.send_message(chat_id=callback.message.chat.id, text="Хорошо, теперь выбери строгость оценивания", reply_markup=keyboard)
@@ -103,7 +105,7 @@ async def callback_mode(callback: types.CallbackQuery, state: FSMContext, bot: B
     elif callback.data == "hard_skill":
         await state.update_data(mode="Строгий")
 
-
+    await bot.delete_message(chat_id=callback.message.chat.id, message_id=callback.message.message_id)
     await bot.send_message(chat_id=callback.message.chat.id, text="⌛ Анализирую...")
     data = await state.get_data()
     skill = data["skill"]
@@ -152,10 +154,12 @@ async def callback_theme_choice(callback: types.CallbackQuery, state: FSMContext
         keyboard = keyboards.get_debate_difficulty_keyboard()
         await bot.send_message(chat_id=callback.message.chat.id, text="Класс, выбери сложность темы! 😎", reply_markup=keyboard)
         await state.set_state(DebateState.level)
+        await bot.delete_message(chat_id=callback.message.chat.id, message_id=callback.message.message_id)
     elif callback.data == "my_theme":
         await state.update_data(theme_type="user")
         await bot.send_message(chat_id=callback.message.chat.id, text="Напиши свою тему для спора! ✍️")
         await state.set_state(DebateState.theme)
+
 
 @router.callback_query(DebateState.level, F.data.in_({"easy_theme", "medium_theme", "hard_theme"}))
 async def callback_level(callback: types.CallbackQuery, state: FSMContext, bot: Bot):
@@ -165,6 +169,7 @@ async def callback_level(callback: types.CallbackQuery, state: FSMContext, bot: 
         await state.update_data(level="Стандартная")
     elif callback.data == "hard_theme":
         await state.update_data(level="Сложная")
+    await bot.delete_message(chat_id=callback.message.chat.id, message_id=callback.message.message_id)
 
     keyboard = keyboards.get_mode_debate_keyboard()
     await bot.send_message(chat_id=callback.message.chat.id, text="Теперь выбери, как строго будем оценивать твои аргументы! 😎", reply_markup=keyboard)
@@ -186,7 +191,7 @@ async def callback_mode(callback: types.CallbackQuery, state: FSMContext, bot: B
     elif callback.data == "hard_debate":
         await state.update_data(mode="Строгий")
 
-
+    await bot.delete_message(chat_id=callback.message.chat.id, message_id=callback.message.message_id)
     await bot.send_message(chat_id=callback.message.chat.id, text="⌛ Анализирую...")
     data = await state.get_data()
     if "level" in data:
@@ -213,6 +218,7 @@ async def answer_message(message: types.Message, state: FSMContext):
     await add_histotyUSER(message.from_user.id, message.text)
     history = user_dialog_history.get(user_id, []) 
     if history:
+        await message.answer("⌛ Анализирую...")
         history_str = "\n".join([f"{sender}: {msg}" for sender, msg in history])
         answerbot = await continious_answer(history_str, message.text)
         await add_histotyBOT(message.from_user.id, answerbot)
@@ -224,6 +230,7 @@ async def answer_message_debate(message: types.Message, state: FSMContext):
     await add_histotyUSER(message.from_user.id, message.text)
     history = user_dialog_history.get(user_id, []) 
     if history:
+        await message.answer("⌛ Анализирую...")
         data = await state.get_data()
         mode = data["mode"]
         history_str = "\n".join([f"{sender}: {msg}" for sender, msg in history])
