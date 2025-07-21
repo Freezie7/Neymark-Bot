@@ -11,7 +11,7 @@ async def main():
     dp = Dispatcher()
 
     for router in routers:  # Подключаем все обработчики
-            dp.include_router(router)
+        dp.include_router(router)
 
     dp.startup.register(on_startup)
     try:

@@ -120,7 +120,7 @@ async def callback_mode(callback: types.CallbackQuery, state: FSMContext, bot: B
     await bot.send_message(chat_id=callback.message.chat.id, text=answer) 
     await state.set_state(SkillState.answer)
 
-@router.message(SkillState.answer)
+@router.message(SkillState.answer, F.text)
 async def answer_message(message: types.Message, state: FSMContext):
     await state.update_data(answer=message.text)
     await add_histotyUSER(message.from_user.id, message.text)
@@ -212,19 +212,7 @@ async def callback_mode(callback: types.CallbackQuery, state: FSMContext, bot: B
     user_dialog_history[callback.from_user.id].append(("Бот", answerbot))
 
 
-@router.message(SkillState.answer)
-async def answer_message(message: types.Message, state: FSMContext):
-    user_id = message.from_user.id
-    await add_histotyUSER(message.from_user.id, message.text)
-    history = user_dialog_history.get(user_id, []) 
-    if history:
-        await message.answer("⌛ Анализирую...")
-        history_str = "\n".join([f"{sender}: {msg}" for sender, msg in history])
-        answerbot = await continious_answer(history_str, message.text)
-        await add_histotyBOT(message.from_user.id, answerbot)
-        await message.answer(answerbot)
-
-@router.message(DebateState.mode)
+@router.message(DebateState.mode, F.text)
 async def answer_message_debate(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
     await add_histotyUSER(message.from_user.id, message.text)
@@ -255,5 +243,4 @@ async def add_histotyUSER(userid: int, mes: str):
     if userid not in user_dialog_history:
         user_dialog_history[userid] = []
     user_dialog_history[userid].append(("Пользователь: ", mes))
-
 
