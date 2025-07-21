@@ -5,7 +5,7 @@ import keyboards
 router = Router()
 import os
 from utils.speech import speech_to_text, find_pauses
-from utils.ai import analyze_with_chatgpt
+from utils.ai import create_analyze_answer
 
 @router.message(F.voice)
 async def handle_voice(message: Message):
@@ -27,8 +27,8 @@ async def handle_voice(message: Message):
         text += f"\n\n⏸ Обнаружено пауз: {len(pauses)}"
 
     # Глубокий анализ через OpenRouter
-    analysis = await analyze_with_chatgpt(text)
-    await message.reply(analysis)
+    #analysis = await create_analyze_answer(text)
+    #await message.reply(analysis)
     #удаление временных файлов
     os.remove(voice_path)
     os.remove(wav_path)
