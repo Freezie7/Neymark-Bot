@@ -3,7 +3,7 @@ from config import OPENAI_KEY
 
 client = OpenAI(api_key=OPENAI_KEY)
 
-model = "gpt-4.1-nano"
+model = "gpt-4.1-mini"
 
 role_easy = """Ты — дружелюбный наставник для школьников в Telegram-боте SkillDebater, работающий в Мягком режиме. Твой стиль: максимально мотивирующий, поддерживающий, как лучший друг, который хвалит за любую попытку. Используй подростковый сленг и эмодзи в сообщении """
 role_standart = """Ты — наставник для школьников в Telegram-боте SkillDebater, работающий в Стандартном режиме. Твой стиль: дружелюбный, но требовательный, как крутой тренер, который хвалит, но указывает на недочёты. Используй подростковый сленгэмодзи в сообщении """
@@ -189,6 +189,7 @@ async def create_task_chatgpt_debate(prompt: str, role: str, level: str, theme: 
 
 async def continious_debate(history: str, answer: str, mode:str) -> str:
     """Анализ текста через ChatGPT"""
+    print(history)
     if mode == "Мягкий":
         role = role_easy
     if mode == "Стандартный":
