@@ -35,6 +35,24 @@ async def skill_mode(message: types.Message, state: FSMContext):
     await state.set_state(SkillState.skill)
     await message.answer("Давай прокачаем твои soft skills! Выбери навык который хочешь улучшить", reply_markup=keyboard)
 
+#ОТМЕНА
+@router.message(F.text == "Отмена")
+async def skill_mode(message: types.Message, state: FSMContext):
+    await state.clear()
+    keyboard = keyboards.get_main_keyboard() 
+    await message.answer("""
+        🌟 Привет, бро! Я SkillDebater — твой наставник по прокачке навыков и мастерству дебатов! 💬  
+Хочешь стать увереннее, говорить чётко или побеждать в спорах? 🚀  
+    Выбери режим:  
+        ✨ Skills Mode — тренируй навыки (публичные выступления, речь и др.)  
+        🗣️ Debate Mode — спорь как профи на крутые темы!  
+Напиши команду и начнём! 😎
+        """, reply_markup=keyboard
+    )
+    user_id = message.from_user.id
+    if user_id in user_dialog_history:
+        del user_dialog_history[user_id]  # Удаляем история диалога
+
 @router.callback_query(SkillState.skill, F.data.in_({"one", "two", "three","four","five"}))
 async def callback_skillmode(callback: types.CallbackQuery, state: FSMContext, bot: Bot):
     if callback.data == "one":
@@ -107,7 +125,8 @@ async def answer_message(message: types.Message, state: FSMContext):
     answer = data["answer"]
     await state.clear()
     answerbot = await create_analyze_answer(skill, mode, history_str, answer)
-    await message.answer(answerbot)
+    keyboard = keyboards.get_cancel_keyboard()
+    await message.answer(answerbot, reply_markup=keyboard)
     await add_histotyBOT(message.from_user.id, answerbot)
 
 

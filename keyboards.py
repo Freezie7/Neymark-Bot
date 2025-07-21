@@ -18,6 +18,13 @@ def get_skillmode_keyboard():
         ]
         return InlineKeyboardMarkup(inline_keyboard=keyboard)
 
+def get_cancel_keyboard():
+    keyboard = [
+      [KeyboardButton(text="Отмена")]
+    ]
+
+    return ReplyKeyboardMarkup(keyboard=keyboard, resize_keyboard=True)
+
 def get_mode_keyboard():
         keyboard = [
             [InlineKeyboardButton(text="Мягкий", callback_data="easy_skill")],
