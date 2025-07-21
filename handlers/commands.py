@@ -4,13 +4,14 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 import keyboards
-from utils.ai import create_prompt_taskskill, create_analyze_answer
+from utils.ai import create_prompt_taskskill, create_analyze_answer, continious_answer
 router = Router()
 
 user_dialog_history = {}
 
 class SkillState(StatesGroup):
     skill = State()
+    level = State()
     mode = State()
     answer = State()
 
@@ -47,8 +48,22 @@ async def callback_skillmode(callback: types.CallbackQuery, state: FSMContext, b
     elif callback.data == "five":
         await state.update_data(skill="Критическое мышление 🤔")
 
+    keyboard = keyboards.get_task_difficulty_keyboard()
+    await bot.send_message(chat_id=callback.message.chat.id, text="Хорошо, теперь выбери сложность задания", reply_markup=keyboard)
+
+    await state.set_state(SkillState.level)
+
+@router.callback_query(SkillState.level, F.data.in_({"easy_task", "medium_task", "hard_task"}))
+async def callback_level(callback: types.CallbackQuery, state: FSMContext, bot: Bot):
+    if callback.data == "easy_task":
+        await state.update_data(level="Лёгкое")
+    elif callback.data == "medium_task":
+        await state.update_data(level="Среднее")
+    elif callback.data == "hard_task":
+        await state.update_data(level="Сложное")
+
     keyboard = keyboards.get_mode_keyboard()
-    await bot.send_message(chat_id=callback.message.chat.id, text="Хорошо, теперь выбери режим сложности и оценки.", reply_markup=keyboard)
+    await bot.send_message(chat_id=callback.message.chat.id, text="Хорошо, теперь выбери строгость оценивания", reply_markup=keyboard)
 
     await state.set_state(SkillState.mode)
 
@@ -66,7 +81,8 @@ async def callback_mode(callback: types.CallbackQuery, state: FSMContext, bot: B
     data = await state.get_data()
     skill = data["skill"]
     mode = data["mode"]
-    answer = await create_prompt_taskskill(skill, mode)
+    level = data["level"]
+    answer = await create_prompt_taskskill(skill, mode, level)
     #сохранение в историю
     if callback.from_user.id not in user_dialog_history:
         user_dialog_history[callback.from_user.id] = []
@@ -78,7 +94,7 @@ async def callback_mode(callback: types.CallbackQuery, state: FSMContext, bot: B
 @router.message(SkillState.answer)
 async def answer_message(message: types.Message, state: FSMContext):
     await state.update_data(answer=message.text)
-
+    await add_histotyUSER(message.from_user.id, message.text)
     await message.answer("⌛ Анализирую...")
     data = await state.get_data()
     skill = data["skill"]
@@ -92,17 +108,33 @@ async def answer_message(message: types.Message, state: FSMContext):
     await state.clear()
     answerbot = await create_analyze_answer(skill, mode, history_str, answer)
     await message.answer(answerbot)
+    await add_histotyBOT(message.from_user.id, answerbot)
 
-    if message.from_user.id not in user_dialog_history:
-            user_dialog_history[message.from_user.id] = []
-    user_dialog_history[message.from_user.id].append(("Пользователь", message.text))
 
-    #удаляем историю
-    if user_id in user_dialog_history:
-        del user_dialog_history[user_id]
+
+@router.message()
+async def answer_message(message: types.Message, state: FSMContext):
+    user_id = message.from_user.id
+    history = user_dialog_history.get(user_id, []) 
+    if history:
+        history_str = "\n".join([f"{sender}: {msg}" for sender, msg in history])
+        answerbot = await continious_answer(history_str, message.text)
+        await message.answer(answerbot)
+        
 
 
 @router.message(Command("help"))
 async def cmd_help(message: Message):
     await message.answer("Помощь: ...")
+
+
+async def add_histotyBOT(userid: int, mes: str):
+    if userid not in user_dialog_history:
+        user_dialog_history[userid] = []
+    user_dialog_history[userid].append(("Бот: ", mes))
+
+async def add_histotyUSER(userid: int, mes: str):
+    if userid not in user_dialog_history:
+        user_dialog_history[userid] = []
+    user_dialog_history[userid].append(("Пользователь: ", mes))
 

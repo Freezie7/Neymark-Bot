@@ -25,3 +25,11 @@ def get_mode_keyboard():
             [InlineKeyboardButton(text="Строгий", callback_data="hard_skill")],
         ]
         return InlineKeyboardMarkup(inline_keyboard=keyboard)
+
+def get_task_difficulty_keyboard():
+    keyboard = [
+        [InlineKeyboardButton(text="Лёгкое 😄", callback_data="easy_task")],
+        [InlineKeyboardButton(text="Среднее ⚖️", callback_data="medium_task")],
+        [InlineKeyboardButton(text="Сложное 🔥", callback_data="hard_task")],
+    ]
+    return InlineKeyboardMarkup(inline_keyboard=keyboard)
